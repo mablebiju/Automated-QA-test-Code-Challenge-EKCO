@@ -1,0 +1,21 @@
+//Test Case 2 – Form errors
+import { test, expect } from '@playwright/test';
+test('Testcase2', async ({ page }) => {
+  await page.goto('https://portal.ek.co/');
+  const loginFormSelector = '#loginForm';
+  await page.waitForSelector(loginFormSelector);
+  const isLoginFormVisible = await page.isVisible(loginFormSelector); 
+  await expect(isLoginFormVisible).toBe(true);//Assert login form is visible
+
+  const loginButtonSelector = '#login_form > div.form-group.has-feedback > input.btn.btn-primary.login.btn-block'; // CSS selector for login.
+  await page.click(loginButtonSelector); // Click on the "Log In" button.
+  const emailErrorSelector = '#email-error'; //selector for the email error message
+  await page.waitForSelector(emailErrorSelector);
+  const isEmailErrorMessageVisible = await page.isVisible(emailErrorSelector);
+  await expect(isEmailErrorMessageVisible).toBe(true); // Assert email error message is visible
+
+  const passwordErrorSelector = '#passwd-error'; //selector for the password error message
+  const isPasswordErrorMessageVisible = await page.isVisible(passwordErrorSelector);
+  await expect(isPasswordErrorMessageVisible).toBe(true); // Assert password error message is visible
+});
+

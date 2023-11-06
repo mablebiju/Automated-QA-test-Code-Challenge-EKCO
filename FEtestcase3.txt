@@ -1,0 +1,24 @@
+// Test Case 3 – Invalid email error
+import { test, expect } from '@playwright/test';
+
+test('Testcase3', async ({ page }) => {
+  await page.goto('https://portal.ek.co/');
+  const loginFormSelector = '#loginForm';
+  await page.waitForSelector(loginFormSelector);
+  const isLoginFormVisible = await page.isVisible(loginFormSelector);
+  await expect(isLoginFormVisible).toBe(true);
+
+  const invalidEmail = 'email.com'; // Enter an invalid email format into the email input
+  await page.fill('input#email', invalidEmail); //selector for the email input
+  await page.click('#passwd'); // selector for the next input
+
+  const emailErrorSelector = '#email-error'; 
+  const isEmailErrorMessageVisible = await page.isVisible(emailErrorSelector);
+  await expect(isEmailErrorMessageVisible).toBe(true);// Assert email error message 'Email must be a valid email' is visible
+
+  const validEmail = 'email@mail.com';   // Re-enter a valid email
+  await page.fill('input#email', validEmail);
+  const isEmailErrorMessageHidden = await page.isVisible(emailErrorSelector);
+  await expect(isEmailErrorMessageHidden).toBe(true);   // Assert email error message 'Email must be a valid email' is hidden
+
+});

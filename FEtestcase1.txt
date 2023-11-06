@@ -1,0 +1,20 @@
+//Test Case 1 - Navigation
+
+import { test, expect } from '@playwright/test';
+test('Testcase1', async ({ page }) => {
+  // Task 1: Go to https://www.ek.co/ and assert the page title text.
+  await page.goto('https://www.ek.co/');
+  const selector = 'h1'; // CSS selector of the title
+  const elementText = await page.textContent(selector);// Extracting the text content
+  const searchText = 'The people who power your possible'; 
+
+  const loginButtonSelector = 'body > div.off-canvas-wrapper > div > header > nav > div.top-bar__right > div.top-bar__buttons > a.button.top-bar__button-two.hide-for-small-only'; // CSS selector for Login button.
+  await page.click(loginButtonSelector);
+  const url = page.url();
+  await expect(url).toContain('https://portal.ek.co/'); // Asserting URL contains
+
+  const loginFormSelector = '#loginForm';
+  await page.waitForSelector(loginFormSelector);
+  const isLoginFormVisible = await page.isVisible(loginFormSelector);  
+  await expect(isLoginFormVisible).toBe(true); // Assert that the login form is visible
+});
