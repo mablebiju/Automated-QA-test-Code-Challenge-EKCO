@@ -1,0 +1,115 @@
+// Here I am declaring classes for each page and there are further methods which will be useful for all the three testcases provided
+
+class EkHomePage {
+  constructor(page) {
+    this.page = page;
+  }
+
+  async navigateToHomePage() {
+    await this.page.goto('https://www.ek.co/');
+  }
+
+  async getPageTitleText() {
+    return await this.page.textContent('h1');
+  }
+
+  async clickLoginButton() {
+    const loginButtonSelector = 'body > div.off-canvas-wrapper > div > header > nav > div.top-bar__right > div.top-bar__buttons > a.button.top-bar__button-two.hide-for-small-only';
+    await this.page.click(loginButtonSelector);
+  }
+
+  async checkLoginFormVisibility() {
+    const loginFormSelector = '#loginForm';
+    await this.page.waitForSelector(loginFormSelector);
+    return await this.page.isVisible(loginFormSelector);
+  }
+}
+
+class EkLoginPage {
+  constructor(page) {
+    this.page = page;
+  }
+
+  async navigateToLoginPage() {
+    await this.page.goto('https://portal.ek.co/');
+  }
+
+  async checkLoginFormVisibility() {
+    const loginFormSelector = '#loginForm';
+    await this.page.waitForSelector(loginFormSelector);
+    return await this.page.isVisible(loginFormSelector);
+  }
+
+  async clickLoginButton() {
+    const loginButtonSelector = '#login_form > div.form-group.has-feedback > input.btn.btn-primary.login.btn-block';
+    await this.page.click(loginButtonSelector);
+  }
+
+  async checkEmailErrorVisibility() {
+    const emailErrorSelector = '#email-error';
+    await this.page.waitForSelector(emailErrorSelector);
+    return await this.page.isVisible(emailErrorSelector);
+  }
+
+  async checkPasswordErrorVisibility() {
+    const passwordErrorSelector = '#passwd-error';
+    await this.page.waitForSelector(passwordErrorSelector);
+    return await this.page.isVisible(passwordErrorSelector);
+  }
+
+  async fillEmailInput(email) {
+    await this.page.fill('input#email', email);
+  }
+}
+
+// Export the Page Objects
+module.exports = {
+  EkHomePage,
+  EkLoginPage,
+};
+
+//Here I have the flow of my tescases and I used test.only to run each one seperately in Try Playwright
+
+const { test, expect } = require('@playwright/test');
+
+
+test('Testcase1', async ({ page }) => {
+  const ekHomePage = new EkHomePage(page);
+  await ekHomePage.navigateToHomePage();
+  const elementText = await ekHomePage.getPageTitleText();
+  const searchText = 'The people who power your possible';
+  await ekHomePage.clickLoginButton();
+  const url = page.url();
+  await expect(url).toContain('https://portal.ek.co/');
+  const isLoginFormVisible = await ekHomePage.checkLoginFormVisibility();
+  await expect(isLoginFormVisible).toBe(true);
+});
+
+test('Testcase2', async ({ page }) => {
+  const ekLoginPage = new EkLoginPage(page);
+  await ekLoginPage.navigateToLoginPage();
+  const isLoginFormVisible = await ekLoginPage.checkLoginFormVisibility();
+  await expect(isLoginFormVisible).toBe(true);
+  await ekLoginPage.clickLoginButton();
+  const isEmailErrorMessageVisible = await ekLoginPage.checkEmailErrorVisibility();
+  await expect(isEmailErrorMessageVisible).toBe(true);
+  const isPasswordErrorMessageVisible = await ekLoginPage.checkPasswordErrorVisibility();
+  await expect(isPasswordErrorMessageVisible).toBe(true);
+});
+
+test.only('Testcase3', async ({ page }) => {
+  const ekLoginPage = new EkLoginPage(page);
+  await ekLoginPage.navigateToLoginPage();
+  const isLoginFormVisible = await ekLoginPage.checkLoginFormVisibility();
+  await expect(isLoginFormVisible).toBe(true);
+  const invalidEmail = 'email.com';
+  await ekLoginPage.fillEmailInput(invalidEmail);
+  await page.click('#passwd'); 
+  const isEmailErrorMessageVisible = await ekLoginPage.checkEmailErrorVisibility();
+  await expect(isEmailErrorMessageVisible).toBe(true);
+  const validEmail = 'email@mail.com';
+  await ekLoginPage.fillEmailInput(validEmail);
+  const isEmailErrorMessageHidden = await page.isVisible('#email-error'); 
+  await expect(isEmailErrorMessageHidden).toBe(true);
+});
+
